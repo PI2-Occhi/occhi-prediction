@@ -190,11 +190,12 @@ def blinkCounter(TOTAL_BLINKS, SEQUENCE_BLINKS, LAST_BLINK_MOMENT, COUNTER, LAST
     #command detection finished
         state = LAST_COMMAND
         LAST_COMMAND = SEQUENCE_BLINKS if SEQUENCE_BLINKS >0 else LAST_COMMAND
-        #check if should toggle the movemnt
-        MOVE = not MOVE if state!=LAST_COMMAND and LAST_COMMAND == 2 else MOVE
-        #commands 3 and 4 must stop the movement
-        if LAST_COMMAND == 3 or LAST_COMMAND == 4:
-            MOVE = False
+        #check if should toggle the movement
+        if state!=LAST_COMMAND:
+            if LAST_COMMAND == 2:
+                MOVE = not MOVE
+            elif LAST_COMMAND == 3 or LAST_COMMAND == 4:
+                MOVE = False
         return SEQUENCE_BLINKS, 0, COUNTER, LAST_BLINK_MOMENT, LAST_COMMAND, MOVE
     elif time_diff<2 and detected:
     #increment command
