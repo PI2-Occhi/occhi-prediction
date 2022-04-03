@@ -28,4 +28,4 @@
    for linux or Mac OS replace`pip` with `pip3` and you are good to go... :wink:
 
 3. Extract landmarks
-   `bunzip2 Predictor/shape_predictor_68_face_landmarks.dat.bz2`
+   `bunzip2 -k Predictor/shape_predictor_68_face_landmarks.dat.bz2`
