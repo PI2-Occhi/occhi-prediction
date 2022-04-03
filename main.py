@@ -6,14 +6,17 @@ import time
 # Variables
 COUNTER = 0
 TOTAL_BLINKS = 0
+SEQUENCE_BLINKS = 0
 CLOSED_EYES_FRAME = 3
 cameraID = 0
 videoPath = "Video/Your Eyes Independently_Trim5.mp4"
 # variables for frame rate.
 FRAME_COUNTER = 0
 START_TIME = time.time()
+LAST_BLINK_MOMENT = START_TIME
+LAST_COMMAND = 0
 FPS = 0
-
+MOVE = False
 
 # creating camera object
 camera = cv.VideoCapture(0)
@@ -25,10 +28,8 @@ fourcc = cv.VideoWriter_fourcc(*'XVID')
 f = camera.get(cv.CAP_PROP_FPS)
 width = camera.get(cv.CAP_PROP_FRAME_WIDTH)
 height = camera.get(cv.CAP_PROP_FRAME_HEIGHT)
-print(width, height, f)
 fileName = videoPath.split('/')[1]
 name = fileName.split('.')[0]
-print(name)
 
 
 # Recoder = cv.VideoWriter(f'{name}.mp4', fourcc, 15, (int(width), int(height)))
@@ -70,14 +71,19 @@ while True:
             COUNTER += 1
             cv.putText(image, f'Blink', (70, 50),
                        m.fonts, 0.8, m.LIGHT_BLUE, 2)
-            # print("blink")
         else:
-            if COUNTER > CLOSED_EYES_FRAME:
-                TOTAL_BLINKS += 1
-                COUNTER = 0
-        cv.putText(image, f'Total Blinks: {TOTAL_BLINKS}', (230, 17),
+            BEFORE_COMMAND = LAST_COMMAND
+            TOTAL_BLINKS, SEQUENCE_BLINKS, COUNTER, LAST_BLINK_MOMENT, LAST_COMMAND, MOVE = m.blinkCounter(TOTAL_BLINKS, SEQUENCE_BLINKS, LAST_BLINK_MOMENT, COUNTER, LAST_COMMAND, MOVE, COUNTER > CLOSED_EYES_FRAME)
+            COMMANDS = {
+                2: 'STOP MOVEMENT' if not MOVE else 'START MOVEMENT',
+                3: '180 DEGRESS MOVEMENT',
+                4: 'REVERSE MOVEMENT'
+            }
+            if LAST_COMMAND in COMMANDS.keys():
+                cv.putText(image, COMMANDS[LAST_COMMAND], (230, 75), m.fonts, 0.5, m.BLACK, 2)
+        cv.putText(image, f'Last blink count: {LAST_COMMAND}', (230, 17),
                    m.fonts, 0.5, m.ORANGE, 2)
-
+        cv.putText(image, f'{"MOVE" if MOVE else "STOP"}', (230, 40), m.fonts, 0.5, m.LIGHT_RED if not MOVE else m.LIGHT_GREEN, 2)
         # for p in LeftEyePoint:
         #     cv.circle(image, p, 3, m.MAGENTA, 1)
         mask, pos, color = m.EyeTracking(frame, grayFrame, RightEyePoint)
