@@ -1,7 +1,9 @@
+from distutils.command.build import build
 import cv2 as cv
 import numpy as np
 import module as m
 import time
+import json_builder as jb
 
 # Variables
 COUNTER = 0
@@ -17,6 +19,7 @@ LAST_BLINK_MOMENT = START_TIME
 LAST_COMMAND = 0
 FPS = 0
 MOVE = False
+LAST_STATE = []
 
 # creating camera object
 camera = cv.VideoCapture(0)
@@ -67,6 +70,13 @@ while True:
         cv.circle(image, circleCenter, (int(blinkRatio*3.2)), m.CYAN, 2)
         cv.circle(image, circleCenter, (int(blinkRatio*2)), m.GREEN, 3)
 
+        
+        # for p in LeftEyePoint:
+        #     cv.circle(image, p, 3, m.MAGENTA, 1)
+        mask, pos, color = m.EyeTracking(frame, grayFrame, RightEyePoint)
+        maskleft, leftPos, leftColor = m.EyeTracking(
+            frame, grayFrame, LeftEyePoint)
+
         if blinkRatio > 4:
             COUNTER += 1
             cv.putText(image, f'Blink', (70, 50),
@@ -80,15 +90,13 @@ while True:
                 4: 'REVERSE MOVEMENT'
             }
             if LAST_COMMAND in COMMANDS.keys():
+                if [COMMANDS[LAST_COMMAND], pos, leftPos] != LAST_STATE:
+                    jb.build_json(COMMANDS[LAST_COMMAND], pos, leftPos)
                 cv.putText(image, COMMANDS[LAST_COMMAND], (230, 75), m.fonts, 0.5, m.BLACK, 2)
+                LAST_STATE = [COMMANDS[LAST_COMMAND], pos, leftPos]
         cv.putText(image, f'Last blink count: {LAST_COMMAND}', (230, 17),
                    m.fonts, 0.5, m.ORANGE, 2)
         cv.putText(image, f'{"MOVE" if MOVE else "STOP"}', (230, 40), m.fonts, 0.5, m.LIGHT_RED if not MOVE else m.LIGHT_GREEN, 2)
-        # for p in LeftEyePoint:
-        #     cv.circle(image, p, 3, m.MAGENTA, 1)
-        mask, pos, color = m.EyeTracking(frame, grayFrame, RightEyePoint)
-        maskleft, leftPos, leftColor = m.EyeTracking(
-            frame, grayFrame, LeftEyePoint)
 
         # draw background as line where we put text.
         cv.line(image, (30, 90), (100, 90), color[0], 30)
