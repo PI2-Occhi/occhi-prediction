@@ -10,18 +10,14 @@
      - Visual Studio Build Tools
      - Cmake
 
-   `pip install cmake `
-
-   `pip install dlib`
+   `pip install -r requirements.txt`
 
    #### Linux or Mac OS
 
    - Just you need Cmake that all here on linux and Mac OS
    - install Dilb uisng Pip command
 
-     `pip3 install cmake`
-
-     `pip3 install dlib`
+   `pip install -r requirements.txt`
 
 2. Install opencv-python
    `pip install opencv-python`

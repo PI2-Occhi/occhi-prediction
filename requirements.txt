@@ -1,0 +1,4 @@
+dlib
+cmake
+numpy
+paho-mqtt
